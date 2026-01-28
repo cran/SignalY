@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="José Mauricio Gómez Julián" />
+
+
+<title>SignalY: Technical Documentation</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">SignalY: Technical Documentation</h1>
+<h3 class="subtitle">Comprehensive Signal Extraction from Panel
+Data</h3>
+<h4 class="author">José Mauricio Gómez Julián</h4>
+<h4 class="date">24 enero 2026 - 13:18</h4>
+
+
+
+<div id="abstract" class="section level1">
+<h1>Abstract</h1>
+<p>This document provides comprehensive technical documentation for the
+SignalY R package, a unified framework for signal extraction from panel
+data. The package integrates spectral decomposition methods (wavelets,
+EMD, Bayesian HP filters), Bayesian sparse regression (regularized
+Horseshoe), dimensionality reduction (PCA, Dynamic Factor Models), and
+stationarity testing into a coherent analytical pipeline. We detail the
+mathematical foundations, algorithmic implementations, and
+interpretation frameworks underlying each methodology.</p>
+<hr />
+</div>
+<div id="introduction-and-epistemological-framework" class="section level1">
+<h1>Introduction and Epistemological Framework</h1>
+<div id="motivation" class="section level2">
+<h2>Motivation</h2>
+<p>The analysis of multivariate time series data—particularly panel data
+with cross-sectional and temporal dimensions—presents fundamental
+challenges:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Dimensionality</strong>: Many candidate variables may
+influence the signal of interest</li>
+<li><strong>Frequency mixing</strong>: Observed dynamics conflate
+trends, cycles, and noise</li>
+<li><strong>Sparsity</strong>: Few variables may carry genuine
+predictive information</li>
+<li><strong>Persistence</strong>: Non-stationarity complicates
+inference</li>
+</ol>
+<p>SignalY addresses these challenges through a unified pipeline
+distinguishing latent structure from phenomenological dynamics.</p>
+</div>
+<div id="conceptual-mapping" class="section level2">
+<h2>Conceptual Mapping</h2>
+<p><strong>Definition 1.1 (Latent Structure).</strong> The underlying
+data-generating process <span class="math inline">\(\mathcal{M}\)</span>
+that produces observable patterns, characterized by:</p>
+<ul>
+<li>Deterministic components (trends, seasonality)</li>
+<li>Common factors driving co-movement</li>
+<li>Sparse causal relationships</li>
+</ul>
+<p><strong>Definition 1.2 (Phenomenological Dynamics).</strong>
+Surface-level variability <span class="math inline">\(Y_{\text{obs}} =
+f(\mathcal{M}) + \varepsilon\)</span>, where <span class="math inline">\(\varepsilon\)</span> captures idiosyncratic shocks
+and measurement error.</p>
+<p>The methodological components of SignalY operationalize this
+distinction:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Extracts</th>
+<th>Distinguishes From</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Wavelets/EMD</td>
+<td>Trend, cycles</td>
+<td>High-frequency noise</td>
+</tr>
+<tr class="even">
+<td>Horseshoe</td>
+<td>Relevant predictors</td>
+<td>Noise variables</td>
+</tr>
+<tr class="odd">
+<td>PCA/DFM</td>
+<td>Common factors</td>
+<td>Idiosyncratic variation</td>
+</tr>
+<tr class="even">
+<td>Unit root tests</td>
+<td>Persistence type</td>
+<td>Stationarity properties</td>
+</tr>
+</tbody>
+</table>
+<hr />
+</div>
+</div>
+<div id="spectral-decomposition-methods" class="section level1">
+<h1>Spectral Decomposition Methods</h1>
+<div id="wavelet-multi-resolution-analysis" class="section level2">
+<h2>Wavelet Multi-Resolution Analysis</h2>
+<div id="theoretical-foundation" class="section level3">
+<h3>Theoretical Foundation</h3>
+<p>The Discrete Wavelet Transform (DWT) decomposes a signal into
+frequency bands via dilations and translations of mother wavelet <span class="math inline">\(\psi(t)\)</span> and scaling function <span class="math inline">\(\phi(t)\)</span>:</p>
+<p><span class="math display">\[
+\psi_{j,k}(t) = 2^{j/2} \psi(2^j t - k)
+\]</span></p>
+<p><span class="math display">\[
+\phi_{j,k}(t) = 2^{j/2} \phi(2^j t - k)
+\]</span></p>
+<p>For a signal <span class="math inline">\(x(t)\)</span> of length
+<span class="math inline">\(N = 2^J\)</span>:</p>
+<p><span class="math display">\[
+x(t) = \sum_k s_{J,k} \phi_{J,k}(t) + \sum_{j=1}^{J} \sum_k d_{j,k}
+\psi_{j,k}(t)
+\]</span></p>
+<p>where <span class="math inline">\(s_{J,k}\)</span> are smooth
+coefficients and <span class="math inline">\(d_{j,k}\)</span> are detail
+coefficients at scale <span class="math inline">\(j\)</span>.</p>
+</div>
+<div id="modwt-implementation" class="section level3">
+<h3>MODWT Implementation</h3>
+<p>SignalY uses the Maximal Overlap Discrete Wavelet Transform (MODWT),
+which:</p>
+<ul>
+<li>Is shift-invariant (unlike DWT)</li>
+<li>Works for arbitrary sample sizes (not just powers of 2)</li>
+<li>Produces aligned multi-resolution analysis (MRA)</li>
+</ul>
+<p><strong>Algorithm 1: Wavelet Multi-Resolution Analysis</strong></p>
+<pre><code>Require: Signal x, filter type, levels to combine L
+1: Apply MODWT: (W₁, ..., W_J, V_J) ← MODWT(x)
+2: Compute MRA details: D_j ← MRA(W_j) for j = 1, ..., J
+3: Compute smooth: S_J ← MRA(V_J)
+4: Combine selected levels: C ← Σ_{j∈L} D_j
+5: return (C, S_J, {D_j})</code></pre>
+</div>
+<div id="filter-selection" class="section level3">
+<h3>Filter Selection</h3>
+<p>The package supports Daubechies least asymmetric filters (LA) with
+<span class="math inline">\(L\)</span> vanishing moments:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Filter</th>
+<th>Length</th>
+<th>Recommended Use</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>la8</td>
+<td>8</td>
+<td>Economic/financial data</td>
+</tr>
+<tr class="even">
+<td>la16</td>
+<td>16</td>
+<td>Very smooth signals</td>
+</tr>
+<tr class="odd">
+<td>d4</td>
+<td>4</td>
+<td>Compact support needed</td>
+</tr>
+<tr class="even">
+<td>haar</td>
+<td>2</td>
+<td>Discontinuous signals</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="scale-period-correspondence" class="section level3">
+<h3>Scale-Period Correspondence</h3>
+<p>For sampling period <span class="math inline">\(\Delta t\)</span>,
+level <span class="math inline">\(j\)</span> captures periods:</p>
+<p><span class="math display">\[
+T_j \in [2^j \Delta t, 2^{j+1} \Delta t]
+\]</span></p>
+<p>For annual data (<span class="math inline">\(\Delta t = 1\)</span>
+year):</p>
+<ul>
+<li><span class="math inline">\(D_3 + D_4\)</span>: 8–32 year cycles
+(business cycle range)</li>
+<li><span class="math inline">\(D_5 + D_6\)</span>: 32–128 year cycles
+(long waves)</li>
+</ul>
+</div>
+</div>
+<div id="empirical-mode-decomposition" class="section level2">
+<h2>Empirical Mode Decomposition</h2>
+<div id="sifting-algorithm" class="section level3">
+<h3>Sifting Algorithm</h3>
+<p>EMD decomposes <span class="math inline">\(x(t)\)</span> into
+Intrinsic Mode Functions (IMFs) adaptively:</p>
+<p><strong>Definition 2.1 (Intrinsic Mode Function).</strong> A function
+<span class="math inline">\(c(t)\)</span> is an IMF if:</p>
+<ol style="list-style-type: decimal">
+<li>The number of extrema and zero-crossings differ by at most one</li>
+<li>The mean of upper and lower envelopes is zero at all points</li>
+</ol>
+</div>
+<div id="reconstruction-property" class="section level3">
+<h3>Reconstruction Property</h3>
+<p><span class="math display">\[
+x(t) = \sum_{k=1}^{K} c_k(t) + r_K(t)
+\]</span></p>
+<p><strong>Algorithm 2: EMD Sifting Process</strong></p>
+<pre><code>Require: Signal x, max IMFs K
+1: r₀ ← x
+2: for k = 1, ..., K do
+3:     h ← r_{k-1}
+4:     repeat
+5:         Identify local maxima and minima of h
+6:         Interpolate upper envelope e_max, lower envelope e_min
+7:         Compute mean envelope: m ← (e_max + e_min)/2
+8:         Update: h ← h - m
+9:     until h satisfies IMF criteria
+10:    c_k ← h
+11:    r_k ← r_{k-1} - c_k
+12: end for
+13: return IMFs {c_k} and residue r_K</code></pre>
+</div>
+</div>
+<div id="bayesian-hp-gc-filter" class="section level2">
+<h2>Bayesian HP-GC Filter</h2>
+<div id="state-space-formulation" class="section level3">
+<h3>State Space Formulation</h3>
+<p>The Grant-Chan HP filter embeds trend-cycle decomposition in a state
+space model:</p>
+<p><span class="math display">\[
+y_t = \tau_t + \psi_t + \varepsilon_t, \quad \varepsilon_t \sim
+\mathcal{N}(0, \sigma_\varepsilon^2)
+\]</span></p>
+<p><span class="math display">\[
+\Delta^2 \tau_t = \eta_t, \quad \eta_t \sim \mathcal{N}(0,
+\sigma_\tau^2)
+\]</span></p>
+<p><span class="math display">\[
+\psi_t = \phi_1 \psi_{t-1} + \phi_2 \psi_{t-2} + \omega_t, \quad
+\omega_t \sim \mathcal{N}(0, \sigma_\psi^2)
+\]</span></p>
+<p>where <span class="math inline">\(\tau_t\)</span> is trend, <span class="math inline">\(\psi_t\)</span> is cycle, and <span class="math inline">\(\varepsilon_t\)</span> is irregular.</p>
+</div>
+<div id="prior-configurations" class="section level3">
+<h3>Prior Configurations</h3>
+<p>The package implements three prior configurations:</p>
+<p><strong>1. Weakly Informative:</strong></p>
+<p><span class="math display">\[
+\sigma_\tau^2, \sigma_\psi^2, \sigma_\varepsilon^2 \sim
+\text{Inv-Gamma}(0.01, 0.01)
+\]</span></p>
+<p><span class="math display">\[
+\phi_1, \phi_2 \sim \mathcal{N}(0, 10^2)
+\mathbf{1}_{[\text{stationary}]}
+\]</span></p>
+<p><strong>2. Informative (calibrated to HP-1600 for annual
+data):</strong></p>
+<p><span class="math display">\[
+\sigma_\tau^2 / \sigma_\psi^2 \sim \text{Log-Normal}(\log(1/100), 0.5)
+\]</span></p>
+<p><strong>3. Empirical Bayes:</strong> Hyperparameters estimated from
+data</p>
+<p>Model selection via Deviance Information Criterion:</p>
+<p><span class="math display">\[
+\text{DIC} = \bar{D}(\theta) + p_D = -2\mathbb{E}[\log p(y|\theta)] +
+2p_D
+\]</span></p>
+<hr />
+</div>
+</div>
+</div>
+<div id="bayesian-sparse-regression-regularized-horseshoe" class="section level1">
+<h1>Bayesian Sparse Regression: Regularized Horseshoe</h1>
+<div id="model-specification" class="section level2">
+<h2>Model Specification</h2>
+<p>For response <span class="math inline">\(y \in \mathbb{R}^n\)</span>
+and predictors <span class="math inline">\(X \in \mathbb{R}^{n \times
+p}\)</span>:</p>
+<p><span class="math display">\[
+y_i = \alpha + x_i^\top \beta + \varepsilon_i, \quad \varepsilon_i \sim
+\mathcal{N}(0, \sigma^2)
+\]</span></p>
+<div id="horseshoe-prior" class="section level3">
+<h3>Horseshoe Prior</h3>
+<p>The standard Horseshoe places:</p>
+<p><span class="math display">\[
+\beta_j | \lambda_j, \tau \sim \mathcal{N}(0, \lambda_j^2 \tau^2)
+\]</span></p>
+<p><span class="math display">\[
+\lambda_j \sim \mathcal{C}^+(0, 1)
+\]</span></p>
+<p><span class="math display">\[
+\tau \sim \mathcal{C}^+(0, \tau_0)
+\]</span></p>
+<p>where <span class="math inline">\(\mathcal{C}^+(0, s)\)</span>
+denotes half-Cauchy with scale <span class="math inline">\(s\)</span>.</p>
+</div>
+<div id="regularized-horseshoe" class="section level3">
+<h3>Regularized Horseshoe</h3>
+<p>Piironen &amp; Vehtari introduce slab regularization via:</p>
+<p><span class="math display">\[
+\tilde{\lambda}_j^2 = \frac{c^2 \lambda_j^2}{c^2 + \tau^2 \lambda_j^2}
+\]</span></p>
+<p>with <span class="math inline">\(c^2 \sim \text{Inv-Gamma}(\nu/2, \nu
+s^2/2)\)</span> providing a soft ceiling on coefficient magnitude.</p>
+</div>
+<div id="shrinkage-factors" class="section level3">
+<h3>Shrinkage Factors</h3>
+<p>The shrinkage factor <span class="math inline">\(\kappa_j\)</span>
+quantifies the degree of shrinkage:</p>
+<p><span class="math display">\[
+\kappa_j = \frac{1}{1 + \tau^2 \lambda_j^2 / c^2}
+\]</span></p>
+<p><strong>Proposition 3.1 (Shrinkage Interpretation).</strong> As <span class="math inline">\(\kappa_j \to 0\)</span>, <span class="math inline">\(\beta_j\)</span> is essentially unshrunken
+(signal). As <span class="math inline">\(\kappa_j \to 1\)</span>, <span class="math inline">\(\beta_j\)</span> is strongly shrunk toward zero
+(noise).</p>
+</div>
+<div id="effective-number-of-non-zeros" class="section level3">
+<h3>Effective Number of Non-Zeros</h3>
+<p><span class="math display">\[
+m_e = \sum_{j=1}^{p} (1 - \kappa_j)
+\]</span></p>
+</div>
+</div>
+<div id="global-shrinkage-calibration" class="section level2">
+<h2>Global Shrinkage Calibration</h2>
+<p>Following Piironen &amp; Vehtari, calibrate <span class="math inline">\(\tau_0\)</span> based on expected sparsity:</p>
+<p><span class="math display">\[
+\tau_0 = \frac{p_0}{p - p_0} \cdot \frac{\sigma}{\sqrt{n}}
+\]</span></p>
+<p>where <span class="math inline">\(p_0\)</span> is the expected number
+of relevant predictors.</p>
+</div>
+<div id="stan-implementation" class="section level2">
+<h2>Stan Implementation</h2>
+<p>The package uses non-centered parameterization for efficient NUTS
+sampling:</p>
+<p><span class="math display">\[
+z_j \sim \mathcal{N}(0, 1)
+\]</span></p>
+<p><span class="math display">\[
+\beta_j = \tau \cdot \tilde{\lambda}_j \cdot z_j
+\]</span></p>
+<p><strong>Key diagnostics monitored:</strong></p>
+<ul>
+<li>Divergent transitions: Should be 0</li>
+<li><span class="math inline">\(\hat{R}\)</span>: Should be &lt;
+1.01</li>
+<li>Effective sample size (ESS): Should be &gt; 400</li>
+<li>BFMI: Should be &gt; 0.2</li>
+</ul>
+<hr />
+</div>
+</div>
+<div id="dimensionality-reduction" class="section level1">
+<h1>Dimensionality Reduction</h1>
+<div id="pca-with-bootstrap-significance" class="section level2">
+<h2>PCA with Bootstrap Significance</h2>
+<div id="standard-pca" class="section level3">
+<h3>Standard PCA</h3>
+<p>For centered data matrix <span class="math inline">\(X \in
+\mathbb{R}^{n \times p}\)</span>, PCA solves:</p>
+<p><span class="math display">\[
+\max_w w^\top X^\top X w \quad \text{s.t.} \quad \|w\| = 1
+\]</span></p>
+<p>yielding loadings <span class="math inline">\(W = [w_1, \ldots,
+w_k]\)</span> and scores <span class="math inline">\(Z =
+XW\)</span>.</p>
+</div>
+<div id="bootstrap-significance-testing" class="section level3">
+<h3>Bootstrap Significance Testing</h3>
+<p><strong>Algorithm 3: Block Bootstrap for PCA Loadings</strong></p>
+<pre><code>Require: Data X, block length b, replications B
+1: Compute original loadings W^(0)
+2: for r = 1, ..., B do
+3:     Generate bootstrap sample X^(r) via block resampling
+4:     Compute loadings W^(r)
+5:     Apply Procrustes rotation to align with W^(0)
+6: end for
+7: For each loading w_jk, compute p-value: (1/B) Σ_r 𝟙[|w^(r)_jk| &gt; |w^(0)_jk|]</code></pre>
+</div>
+<div id="entropy-of-loadings" class="section level3">
+<h3>Entropy of Loadings</h3>
+<p>Shannon entropy quantifies loading concentration:</p>
+<p><span class="math display">\[
+H_k = -\sum_{j=1}^{p} w_{jk}^2 \log(w_{jk}^2)
+\]</span></p>
+<p>where loadings are normalized so <span class="math inline">\(\sum_j
+w_{jk}^2 = 1\)</span>.</p>
+<ul>
+<li><strong>Low <span class="math inline">\(H_k\)</span></strong>:
+Concentrated loadings (few variables dominate)</li>
+<li><strong>High <span class="math inline">\(H_k\)</span></strong>:
+Diffuse loadings (many variables contribute)</li>
+</ul>
+</div>
+</div>
+<div id="dynamic-factor-models" class="section level2">
+<h2>Dynamic Factor Models</h2>
+<div id="model" class="section level3">
+<h3>Model</h3>
+<p>For panel <span class="math inline">\(X_t \in \mathbb{R}^p\)</span>
+at time <span class="math inline">\(t\)</span>:</p>
+<p><span class="math display">\[
+X_t = \Lambda F_t + e_t, \quad e_t \sim \mathcal{N}(0, \Sigma_e)
+\]</span></p>
+<p><span class="math display">\[
+F_t = A_1 F_{t-1} + \cdots + A_q F_{t-q} + \eta_t, \quad \eta_t \sim
+\mathcal{N}(0, I_r)
+\]</span></p>
+<p>where <span class="math inline">\(F_t \in \mathbb{R}^r\)</span> are
+latent factors, <span class="math inline">\(\Lambda \in \mathbb{R}^{p
+\times r}\)</span> are loadings.</p>
+</div>
+<div id="factor-selection-via-information-criteria" class="section level3">
+<h3>Factor Selection via Information Criteria</h3>
+<p>Bai &amp; Ng propose criteria for selecting <span class="math inline">\(r\)</span>:</p>
+<p><span class="math display">\[
+IC_1(r) = \log(V(r)) + r \cdot \frac{n + p}{np} \log\left(\frac{np}{n +
+p}\right)
+\]</span></p>
+<p><span class="math display">\[
+IC_2(r) = \log(V(r)) + r \cdot \frac{n + p}{np} \log(\min(n, p))
+\]</span></p>
+<p><span class="math display">\[
+IC_3(r) = \log(V(r)) + r \cdot \frac{\log(\min(n, p))}{\min(n, p)}
+\]</span></p>
+<p>where <span class="math inline">\(V(r)\)</span> is the sum of squared
+residuals with <span class="math inline">\(r\)</span> factors.</p>
+<hr />
+</div>
+</div>
+</div>
+<div id="unit-root-testing" class="section level1">
+<h1>Unit Root Testing</h1>
+<div id="test-battery" class="section level2">
+<h2>Test Battery</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Test</th>
+<th><span class="math inline">\(H_0\)</span></th>
+<th><span class="math inline">\(H_1\)</span></th>
+<th>Specification</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>ADF (none)</td>
+<td>Unit root</td>
+<td>Stationary</td>
+<td>No constant, no trend</td>
+</tr>
+<tr class="even">
+<td>ADF (drift)</td>
+<td>Unit root</td>
+<td>Stationary</td>
+<td>Constant only</td>
+</tr>
+<tr class="odd">
+<td>ADF (trend)</td>
+<td>Unit root</td>
+<td>Stationary</td>
+<td>Constant + trend</td>
+</tr>
+<tr class="even">
+<td>ERS (DF-GLS)</td>
+<td>Unit root</td>
+<td>Stationary</td>
+<td>GLS-detrended</td>
+</tr>
+<tr class="odd">
+<td>ERS (P-test)</td>
+<td>Unit root</td>
+<td>Stationary</td>
+<td>Point optimal</td>
+</tr>
+<tr class="even">
+<td>KPSS (level)</td>
+<td>Stationary</td>
+<td>Unit root</td>
+<td>Level stationarity</td>
+</tr>
+<tr class="odd">
+<td>KPSS (trend)</td>
+<td>Trend-stationary</td>
+<td>Unit root</td>
+<td>Trend stationarity</td>
+</tr>
+<tr class="even">
+<td>PP</td>
+<td>Unit root</td>
+<td>Stationary</td>
+<td>Non-parametric correction</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="adf-test" class="section level2">
+<h2>ADF Test</h2>
+<p><span class="math display">\[
+\Delta y_t = \alpha + \beta t + \gamma y_{t-1} + \sum_{j=1}^{k} \delta_j
+\Delta y_{t-j} + \varepsilon_t
+\]</span></p>
+<p>Test <span class="math inline">\(H_0: \gamma = 0\)</span> vs <span class="math inline">\(H_1: \gamma &lt; 0\)</span>.</p>
+</div>
+<div id="ers-tests" class="section level2">
+<h2>ERS Tests</h2>
+<div id="df-gls" class="section level3">
+<h3>DF-GLS</h3>
+<p>Apply GLS transformation with <span class="math inline">\(\bar{\alpha} = 1 - 7/T\)</span> (demeaning) or
+<span class="math inline">\(\bar{\alpha} = 1 - 13.5/T\)</span>
+(detrending), then run ADF on transformed series.</p>
+</div>
+<div id="point-optimal-test" class="section level3">
+<h3>Point Optimal Test</h3>
+<p><span class="math display">\[
+P_T = \frac{S(\bar{\alpha}) - \bar{\alpha} S(1)}{s_{AR}^2}
+\]</span></p>
+</div>
+</div>
+<div id="kpss-test" class="section level2">
+<h2>KPSS Test</h2>
+<p><span class="math display">\[
+\eta = \frac{1}{T^2} \sum_{t=1}^{T} S_t^2 / \hat{\sigma}_\infty^2
+\]</span></p>
+<p>where <span class="math inline">\(S_t = \sum_{i=1}^{t} e_i\)</span>
+is partial sum of residuals.</p>
+</div>
+<div id="synthesis-algorithm" class="section level2">
+<h2>Synthesis Algorithm</h2>
+<p><strong>Algorithm 4: Unit Root Test Synthesis</strong></p>
+<pre><code>Require: Test results with p-values
+1: Count ADF/ERS rejections at α = 0.05: n_reject
+2: Count KPSS non-rejections at α = 0.05: n_accept
+3: if n_reject ≥ 2 AND ADF-trend rejects AND ERS confirms then
+4:     Conclude: trend_stationary
+5: else if n_reject ≥ 2 AND KPSS non-rejects then
+6:     Conclude: stationary
+7: else if ADF/ERS fail to reject AND KPSS rejects then
+8:     Conclude: difference_stationary
+9: else
+10:    Conclude: inconclusive
+11: end if</code></pre>
+<hr />
+</div>
+</div>
+<div id="master-function-signal_analysis" class="section level1">
+<h1>Master Function: <code>signal_analysis()</code></h1>
+<div id="pipeline-architecture" class="section level2">
+<h2>Pipeline Architecture</h2>
+<ol style="list-style-type: decimal">
+<li><strong>Data Preparation</strong>
+<ul>
+<li>Validation and type checking</li>
+<li>Missing value handling (interpolation/omission)</li>
+<li>Standardization</li>
+<li>Optional first-differencing</li>
+</ul></li>
+<li><strong>Spectral Decomposition</strong>
+<ul>
+<li>Wavelet MRA</li>
+<li>EMD</li>
+<li>HP-GC filter</li>
+</ul></li>
+<li><strong>Sparse Regression</strong>
+<ul>
+<li>Horseshoe prior estimation</li>
+<li>Shrinkage-based variable selection</li>
+</ul></li>
+<li><strong>Factor Analysis</strong>
+<ul>
+<li>PCA with bootstrap</li>
+<li>DFM estimation</li>
+</ul></li>
+<li><strong>Persistence Analysis</strong>
+<ul>
+<li>Unit root test battery</li>
+<li>Synthesis</li>
+</ul></li>
+<li><strong>Interpretation Generation</strong></li>
+</ol>
+</div>
+<div id="output-structure" class="section level2">
+<h2>Output Structure</h2>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>signal_analysis object<span class="sc">:</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>├── call                    <span class="co"># Function call</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>├── data                    <span class="co"># Processed data</span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>│   ├── Y, X               <span class="co"># Original and standardized</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>│   └── standardization    <span class="co"># Parameters</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>├── filters</span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>│   ├── wavelet            <span class="co"># Wavelet decomposition</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>│   ├── emd                <span class="co"># EMD results</span></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>│   └── hpgc               <span class="co"># HP-GC trend/cycle</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>├── horseshoe</span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>│   ├── summary            <span class="co"># Posterior summaries</span></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a>│   ├── selection          <span class="co"># Variable selection</span></span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a>│   └── diagnostics        <span class="co"># MCMC diagnostics</span></span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a>├── pca</span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a>│   ├── loadings           <span class="co"># With bootstrap p-values</span></span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a>│   ├── scores</span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a>│   └── entropy</span>
+<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a>├── dfm</span>
+<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a>│   ├── factors</span>
+<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a>│   ├── loadings</span>
+<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a>│   └── ic_values</span>
+<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a>├── unitroot</span>
+<span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a>│   ├── tests              <span class="co"># Individual results</span></span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a>│   └── synthesis          <span class="co"># Combined conclusion</span></span>
+<span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a>├── interpretation</span>
+<span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a>│   ├── signal_characteristics</span>
+<span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a>│   ├── variable_selection</span>
+<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a>│   ├── factor_structure</span>
+<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a>│   ├── persistence</span>
+<span id="cb5-30"><a href="#cb5-30" tabindex="-1"></a>│   └── overall_summary</span>
+<span id="cb5-31"><a href="#cb5-31" tabindex="-1"></a>└── config                  <span class="co"># Configuration used</span></span></code></pre></div>
+<hr />
+</div>
+</div>
+<div id="interpretation-framework" class="section level1">
+<h1>Interpretation Framework</h1>
+<div id="signal-characteristics" class="section level2">
+<h2>Signal Characteristics</h2>
+<p><strong>Definition 7.1 (Signal Smoothness).</strong> Measured by
+variance of second differences:</p>
+<p><span class="math display">\[
+\sigma_{\Delta^2 Y}^2 = \text{Var}(\Delta^2 Y_t)
+\]</span></p>
+<table>
+<thead>
+<tr class="header">
+<th><span class="math inline">\(\sigma_{\Delta^2 Y}^2\)</span></th>
+<th>Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>&lt; 0.01</td>
+<td>Very smooth (strong trend dominance)</td>
+</tr>
+<tr class="even">
+<td>0.01 – 0.1</td>
+<td>Moderately smooth</td>
+</tr>
+<tr class="odd">
+<td>0.1 – 0.5</td>
+<td>Moderately volatile</td>
+</tr>
+<tr class="even">
+<td>&gt; 0.5</td>
+<td>Highly volatile (noise-dominated)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="sparsity-assessment" class="section level2">
+<h2>Sparsity Assessment</h2>
+<p><strong>Definition 7.2 (Sparsity Ratio).</strong></p>
+<p><span class="math display">\[
+\rho = 1 - \frac{|\{j : \kappa_j &lt; \kappa^*\}|}{p}
+\]</span></p>
+<p>where <span class="math inline">\(\kappa^*\)</span> is the selection
+threshold (default 0.5).</p>
+</div>
+<div id="information-topology" class="section level2">
+<h2>Information Topology</h2>
+<p><strong>Definition 7.3 (Normalized Entropy).</strong></p>
+<p><span class="math display">\[
+H^* = \frac{H}{\log p}
+\]</span></p>
+<p>where <span class="math inline">\(H\)</span> is Shannon entropy and
+<span class="math inline">\(\log p\)</span> is maximum possible
+entropy.</p>
+<table>
+<thead>
+<tr class="header">
+<th><span class="math inline">\(H^*\)</span></th>
+<th>Topology</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>&lt; 0.3</td>
+<td>Concentrated (few variables dominate)</td>
+</tr>
+<tr class="even">
+<td>0.3 – 0.6</td>
+<td>Moderately distributed</td>
+</tr>
+<tr class="odd">
+<td>&gt; 0.6</td>
+<td>Diffuse (many variables contribute)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+</div>
+</div>
+<div id="computational-considerations" class="section level1">
+<h1>Computational Considerations</h1>
+<div id="complexity-analysis" class="section level2">
+<h2>Complexity Analysis</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Time Complexity</th>
+<th>Space Complexity</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Wavelet (MODWT)</td>
+<td><span class="math inline">\(O(n \log n)\)</span></td>
+<td><span class="math inline">\(O(nJ)\)</span></td>
+</tr>
+<tr class="even">
+<td>EMD</td>
+<td><span class="math inline">\(O(nKI)\)</span></td>
+<td><span class="math inline">\(O(nK)\)</span></td>
+</tr>
+<tr class="odd">
+<td>HP-GC (MCMC)</td>
+<td><span class="math inline">\(O(nMC)\)</span></td>
+<td><span class="math inline">\(O(nC)\)</span></td>
+</tr>
+<tr class="even">
+<td>Horseshoe (MCMC)</td>
+<td><span class="math inline">\(O(npMC)\)</span></td>
+<td><span class="math inline">\(O(np + pC)\)</span></td>
+</tr>
+<tr class="odd">
+<td>PCA</td>
+<td><span class="math inline">\(O(np^2)\)</span></td>
+<td><span class="math inline">\(O(p^2)\)</span></td>
+</tr>
+<tr class="even">
+<td>DFM</td>
+<td><span class="math inline">\(O(npr)\)</span></td>
+<td><span class="math inline">\(O(nr + pr)\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>Where: <span class="math inline">\(J\)</span> = wavelet levels, <span class="math inline">\(K\)</span> = IMFs, <span class="math inline">\(I\)</span> = sifting iterations, <span class="math inline">\(M\)</span> = MCMC iterations, <span class="math inline">\(C\)</span> = chains, <span class="math inline">\(r\)</span> = factors.</p>
+</div>
+<div id="parallelization" class="section level2">
+<h2>Parallelization</h2>
+<ul>
+<li>Stan-based methods parallelize across chains automatically</li>
+<li>Bootstrap replications can be parallelized via <code>future</code>
+backend</li>
+<li>Within-chain parallelization available for large <span class="math inline">\(p\)</span> via Stan’s <code>reduce_sum</code></li>
+</ul>
+<hr />
+</div>
+</div>
+<div id="cran-compliance-notes" class="section level1">
+<h1>CRAN Compliance Notes</h1>
+<div id="soft-dependency-cmdstanr" class="section level2">
+<h2>Soft Dependency: cmdstanr</h2>
+<p>Since <code>cmdstanr</code> is not on CRAN:</p>
+<ol style="list-style-type: decimal">
+<li>Listed in <code>Suggests</code>, not <code>Imports</code></li>
+<li>Additional repository:
+<code>https://mc-stan.org/r-packages/</code></li>
+<li>All Stan-dependent code wrapped in:</li>
+</ol>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">requireNamespace</span>(<span class="st">&quot;cmdstanr&quot;</span>, <span class="at">quietly =</span> <span class="cn">TRUE</span>)) {</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="st">&quot;Package &#39;cmdstanr&#39; required for this function.&quot;</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>}</span></code></pre></div>
+<ol start="4" style="list-style-type: decimal">
+<li>Examples use <code>\dontrun{}</code> for Stan functions</li>
+</ol>
+</div>
+<div id="namespace-hygiene" class="section level2">
+<h2>Namespace Hygiene</h2>
+<ul>
+<li>No <code>library()</code> or <code>require()</code> in package
+code</li>
+<li>Explicit <code>package::function()</code> for <code>Suggests</code>
+packages</li>
+<li>No writes to <code>.GlobalEnv</code></li>
+<li>Temporary files in <code>tempdir()</code> only</li>
+</ul>
+<hr />
+</div>
+</div>
+<div id="references" class="section level1">
+<h1>References</h1>
+<ul>
+<li><p>Bai, J. and Ng, S. (2002). Determining the Number of Factors in
+Approximate Factor Models. <em>Econometrica</em>,
+70(1):191–221.</p></li>
+<li><p>Grant, A.L. and Chan, J.C.C. (2017). A Bayesian Model Comparison
+for Trend-Cycle Decompositions of Output. <em>Journal of Money, Credit
+and Banking</em>, 49(2-3):525–552.</p></li>
+<li><p>Huang, N.E., Shen, Z., Long, S.R., et al. (1998). The empirical
+mode decomposition and the Hilbert spectrum for nonlinear and
+non-stationary time series analysis. <em>Proceedings of the Royal
+Society A</em>, 454:903–995.</p></li>
+<li><p>Percival, D.B. and Walden, A.T. (2000). <em>Wavelet Methods for
+Time Series Analysis</em>. Cambridge University Press.</p></li>
+<li><p>Piironen, J. and Vehtari, A. (2017). Sparsity information and
+regularization in the horseshoe and other shrinkage priors.
+<em>Electronic Journal of Statistics</em>, 11(2):5018–5051.</p></li>
+</ul>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
