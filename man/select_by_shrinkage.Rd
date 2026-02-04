@@ -15,9 +15,13 @@ considered relevant. Default 0.5.}
 \item{verbose}{Logical for messages.}
 }
 \value{
-Character vector of selected variable names.
+List with selected variable names and details.
 }
 \description{
-Alternative variable selection method using shrinkage factors (kappa)
-directly. Does not require projpred.
+Variable selection method using shrinkage factors (kappa).
+Note: This method may underselect when tau collapses to small values.
+Consider using \code{\link{select_by_credible_interval}} as an alternative.
+}
+\seealso{
+\code{\link{select_by_credible_interval}} for a more robust alternative.
 }

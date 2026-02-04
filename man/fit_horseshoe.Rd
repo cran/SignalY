@@ -9,158 +9,88 @@ fit_horseshoe(
   X,
   var_names = NULL,
   p0 = NULL,
-  slab_scale = 2,
+  slab_scale = 3,
   slab_df = 4,
-  use_qr = TRUE,
+  tau_scale = NULL,
+  use_qr = FALSE,
   standardize = TRUE,
-  iter_warmup = 2000,
-  iter_sampling = 2000,
+  X_new = NULL,
+  iter_warmup = 1000,
+  iter_sampling = 1000,
   chains = 4,
-  adapt_delta = 0.99,
-  max_treedepth = 15,
+  adapt_delta = 0.95,
+  max_treedepth = 12,
   seed = 123,
-  verbose = FALSE
+  verbose = TRUE
 )
 }
 \arguments{
-\item{y}{Numeric vector of the response variable (target signal).}
+\item{y}{Numeric vector of the response variable.}
 
-\item{X}{Matrix or data frame of predictor variables (candidate signals).}
+\item{X}{Matrix or data frame of predictor variables.}
 
-\item{var_names}{Optional character vector of variable names. If NULL,
-column names of X are used.}
+\item{var_names}{Optional character vector of variable names.}
 
-\item{p0}{Expected number of non-zero coefficients. If NULL, defaults to
-P/3 where P is the number of predictors. This controls the global
-shrinkage strength.}
+\item{p0}{Expected number of non-zero coefficients. Default: P/3.}
 
-\item{slab_scale}{Scale parameter for the regularizing slab. Default is 2.
-Larger values allow larger coefficients for selected variables.}
+\item{slab_scale}{Scale for the regularizing slab. Default: 3.}
 
-\item{slab_df}{Degrees of freedom for the regularizing slab t-distribution.
-Default is 4. Lower values give heavier tails.}
+\item{slab_df}{Degrees of freedom for the slab. Default: 4.}
 
-\item{use_qr}{Logical indicating whether to use QR decomposition for
-improved numerical stability with correlated predictors. Default TRUE.}
+\item{tau_scale}{Scale multiplier for the global shrinkage prior.
+Default: NULL (auto-calibrated based on data characteristics).
+Increase this value (e.g., 10-20) if the model over-shrinks.}
 
-\item{standardize}{Logical indicating whether to standardize predictors
-internally. Results are returned on original scale. Default TRUE.}
+\item{use_qr}{Use QR decomposition? Default: FALSE.}
 
-\item{iter_warmup}{Number of warmup (burn-in) iterations per chain.
-Default 2000.}
+\item{standardize}{Standardize predictors internally? Default: TRUE.}
 
-\item{iter_sampling}{Number of sampling iterations per chain. Default 2000.}
+\item{X_new}{Optional matrix for out-of-sample prediction.}
 
-\item{chains}{Number of MCMC chains. Default 4.}
+\item{iter_warmup}{Warmup iterations per chain. Default: 1000.}
 
-\item{adapt_delta}{Target acceptance probability for HMC. Higher values
-reduce divergences but slow sampling. Default 0.99.}
+\item{iter_sampling}{Sampling iterations per chain. Default: 1000.}
 
-\item{max_treedepth}{Maximum tree depth for NUTS sampler. Default 15.}
+\item{chains}{Number of MCMC chains. Default: 4.}
 
-\item{seed}{Random seed for reproducibility.}
+\item{adapt_delta}{Target acceptance probability. Default: 0.95.}
 
-\item{verbose}{Logical for progress messages.}
+\item{max_treedepth}{Maximum tree depth. Default: 12.}
+
+\item{seed}{Random seed.}
+
+\item{verbose}{Print progress messages?}
 }
 \value{
-A list of class "signaly_horseshoe" containing:
-\describe{
-\item{coefficients}{Data frame with posterior summaries for each
-coefficient including mean, SD, credible intervals, shrinkage factor
-kappa, and relevance probabilities}
-\item{hyperparameters}{Data frame with posterior summaries for
-hyperparameters (tau, sigma, alpha, m_eff)}
-\item{diagnostics}{MCMC diagnostics including divergences, R-hat, ESS}
-\item{loo}{Leave-one-out cross-validation results}
-\item{posterior_draws}{Raw posterior draws for all parameters}
-\item{fit}{The cmdstanr fit object (if cmdstanr available)}
-\item{settings}{Parameters used in the analysis}
-\item{sparsity}{Summary of sparsity pattern}
-}
+A list of class "signaly_horseshoe" with posterior summaries,
+diagnostics, and model fit object.
 }
 \description{
 Fits a Bayesian linear regression with regularized Horseshoe prior using
-Stan via cmdstanr. The Horseshoe prior provides adaptive shrinkage that
-aggressively shrinks irrelevant coefficients toward zero while allowing
-truly relevant coefficients to remain large.
+Stan via cmdstanr. This version includes improved numerical stability
+and automatic prior calibration.
 }
 \details{
-The regularized Horseshoe prior (Piironen & Vehtari, 2017) models
-coefficients as:
-\deqn{\beta_j | \lambda_j, \tau, c \sim N(0, \tau^2 \tilde\lambda_j^2)}
+The regularized Horseshoe prior (Piironen & Vehtari, 2017) provides adaptive
+shrinkage that can distinguish between relevant and irrelevant predictors.
 
-where the regularized local scale is:
-\deqn{\tilde\lambda_j^2 = \frac{c^2 \lambda_j^2}{c^2 + \tau^2 \lambda_j^2}}
+\strong{Variable Selection Methods:}
 
-This combines:
+After fitting, variables can be selected using different criteria:
 \itemize{
-\item \strong{Global shrinkage} \eqn{\tau}: Controls overall sparsity, with
-prior calibrated to expected number of non-zero coefficients p0
-\item \strong{Local shrinkage} \eqn{\lambda_j}: Half-Cauchy(0,1) allowing
-individual coefficients to escape shrinkage
-\item \strong{Regularizing slab} c: Prevents coefficients from becoming
-unreasonably large for selected variables
-}
-}
-\section{Shrinkage Factor Interpretation}{
-
-The shrinkage factor \eqn{\kappa_j} for each coefficient measures how much
-it is shrunk toward zero:
-\deqn{\kappa_j \approx \frac{1}{1 + \tau^2 \tilde\lambda_j^2}}
-
-\itemize{
-\item \eqn{\kappa_j \approx 0}: Coefficient escapes shrinkage (relevant
-variable)
-\item \eqn{\kappa_j \approx 1}: Coefficient shrunk to zero (irrelevant
-variable)
-\item \eqn{\kappa_j \approx 0.5}: Boundary case (uncertain relevance)
-}
+\item \code{\link{select_by_credible_interval}}: Selects variables whose
+credible interval excludes zero. \strong{Recommended} - most robust method.
+\item \code{\link{select_by_shrinkage}}: Selects based on kappa (shrinkage factor).
+May underselect when tau is very small.
+\item \code{\link{select_by_magnitude}}: Selects based on coefficient magnitude.
 }
 
-\section{Effective Number of Non-Zero Coefficients}{
+\strong{Note on kappa-based selection:}
 
-The model estimates m_eff, the effective number of non-zero coefficients:
-\deqn{m_{eff} = P - \sum_{j=1}^P \kappa_j}
-
-This provides a data-driven estimate of the true sparsity level.
-}
-
-\section{Model Diagnostics}{
-
-The function performs comprehensive MCMC diagnostics:
-\itemize{
-\item \strong{Divergences}: Indicate geometric problems; should be 0
-\item \strong{R-hat}: Chain mixing; should be < 1.01
-\item \strong{ESS}: Effective sample size; should be > 400
-\item \strong{BFMI}: Bayesian fraction of missing information; should be > 0.3
-}
-}
-
-\examples{
-\donttest{
-set.seed(123)
-n <- 100
-p <- 20
-X <- matrix(rnorm(n * p), ncol = p)
-beta_true <- c(rep(2, 3), rep(0, p - 3))
-y <- X \%*\% beta_true + rnorm(n)
-result <- fit_horseshoe(y, X, iter_warmup = 1000, iter_sampling = 1000)
-print(result$coefficients)
-}
-
-}
-\references{
-Piironen, J., & Vehtari, A. (2017). Sparsity information and regularization
-in the horseshoe and other shrinkage priors. Electronic Journal of
-Statistics, 11(2), 5018-5051. \doi{10.1214/17-EJS1337SI}
-
-Piironen, J., & Vehtari, A. (2017). On the hyperprior choice for the global
-shrinkage parameter in the horseshoe prior. Proceedings of Machine Learning
-Research, 54, 905-913.
-
-Carvalho, C. M., Polson, N. G., & Scott, J. G. (2010). The horseshoe
-estimator for sparse signals. Biometrika, 97(2), 465-480.
-}
-\seealso{
-\code{\link{select_by_shrinkage}}, \code{\link{signal_analysis}}
+The shrinkage factor kappa depends on the global shrinkage parameter tau.
+In some datasets, the posterior of tau may concentrate near zero, causing
+all kappa values to be close to 1 even for truly relevant variables.
+When this happens, the coefficient estimates (beta) remain valid, but
+kappa-based selection will fail. The function automatically warns when
+this occurs and recommends using \code{select_by_credible_interval()} instead.
 }

@@ -10,7 +10,7 @@ get_horseshoe_stan_code()
 Character string containing Stan code.
 }
 \description{
-Returns the Stan code for the regularized Horseshoe model. This is used
-when the package is not installed and the inst/stan file is not available.
+Returns the Stan code for the regularized Horseshoe model with improved
+numerical stability and prior calibration.
 }
 \keyword{internal}
